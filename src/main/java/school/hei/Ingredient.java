@@ -17,6 +17,10 @@ public class Ingredient {
         this.dish = dish;
     }
 
+    public String getDishName(){
+        return dish == null ? null : dish.getName();
+    }
+
     public Integer getId() {
         return id;
     }
@@ -76,11 +80,9 @@ public class Ingredient {
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", category=" + category +
+                ", dish=" + getDishName() +
                 '}';
     }
 
-    public String getDishName(){
-        throw new RuntimeException("not implemented");
-    }
 
 }
