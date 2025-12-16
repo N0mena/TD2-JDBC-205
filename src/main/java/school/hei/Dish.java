@@ -1,12 +1,15 @@
 package school.hei;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
     private List<Ingredient> ingredients;
+
+    public Dish(){};
 
     public Dish(Integer id, String name, DishTypeEnum dishType, List<Ingredient> ingredients) {
         this.id = id;
@@ -48,8 +51,31 @@ public class Dish {
         this.ingredients = ingredients;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Dish dish = (Dish) o;
+        return Objects.equals(id, dish.id) && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(ingredients, dish.ingredients);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, dishType, ingredients);
+    }
+
+    @Override
+    public String toString() {
+        return "Dish{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", dishType=" + dishType +
+                ", ingredients=" + ingredients +
+                '}';
+    }
+
+
     public Double getDishPrice(){
-        return List<Ingredient> ingredient
+        throw new RuntimeException("not implemented");
 
     }
 }

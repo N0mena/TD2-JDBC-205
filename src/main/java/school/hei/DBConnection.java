@@ -5,12 +5,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    Connection dbConnection = dbConnection.getConnection();
+    Connection connection ;
 
-    try{
-        Connection connection = DriverManager.getConnection(System.getEnv("url"),System.getEnv("password"),System.getEnv("port"));
-    }catch(SQLException e){
-        throw new RuntimeException(e),
+    public Connection getConnection(){
+        try{
+            Connection connection = DriverManager.getConnection(System.getenv("url"),System.getenv("password"),System.getenv("port"));
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
     }
+
 
 }

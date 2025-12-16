@@ -1,5 +1,7 @@
 package school.hei;
 
+import java.util.Objects;
+
 public class Ingredient {
     private Integer id;
     private String name;
@@ -54,4 +56,31 @@ public class Ingredient {
     public void setDish(Dish dish) {
         this.dish = dish;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Ingredient that = (Ingredient) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(price, that.price) && category == that.category && Objects.equals(dish, that.dish);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, price, category, dish);
+    }
+
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", category=" + category +
+                '}';
+    }
+
+    public String getDishName(){
+        throw new RuntimeException("not implemented");
+    }
+
 }
