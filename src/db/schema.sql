@@ -1,4 +1,4 @@
-create type dish_category as enum ('START' , 'MAIN' , 'DESSERT')
+create type dish_category as enum ('START' , 'MAIN' , 'DESSERT');
 
 create table Dish(
                      id serial primary key ,
