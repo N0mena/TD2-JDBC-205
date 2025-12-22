@@ -41,8 +41,11 @@ public class DataRetriever {
             ResultSet rs = st.executeQuery();
             while(rs.next()){
                 rs.getInt("id");
-
+                rs.getString("name");
             }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
         }
+        return ingredients;
     }
 }
