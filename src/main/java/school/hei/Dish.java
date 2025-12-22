@@ -75,7 +75,9 @@ public class Dish {
 
 
     public Double getDishPrice(){
-        throw new RuntimeException("not implemented");
-
+        return ingredients.stream()
+                .map(ingredient -> ingredient.getPrice())
+                .reduce(0.0, Double::sum);
     }
+
 }
