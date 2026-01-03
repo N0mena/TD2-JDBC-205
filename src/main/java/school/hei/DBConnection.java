@@ -10,15 +10,14 @@ public class DBConnection {
     public Connection getConnection(){
 
         try{
-            String url = System.getenv("jdbc:mysql://localhost:3306/school");
-            String user = System.getenv("postgres");
-            String password = System.getenv("12345");
+            String url = "jdbc:postgresql://localhost:5432/postgres";
+            String user = "mini_dish_db_manager";
+            String password = "123456";
 
-            Connection connection = DriverManager.getConnection(url,user,password);
+            return DriverManager.getConnection(url,user,password);
         }catch(SQLException e){
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     public void closeConnection (){
