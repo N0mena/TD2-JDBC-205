@@ -10,6 +10,7 @@ import java.util.List;
 public class DataRetriever {
     private final DBConnection dbConnection = new DBConnection();
 
+
     public Dish findDishById(Integer id) {
 
         Dish dishById ;
@@ -31,7 +32,7 @@ public class DataRetriever {
                     String dishName = resultSet.getString("name");
                     String dishType = resultSet.getString("dish_type");
 
-                     dishById = new Dish(dishId, dishName, dishType);
+                     dishById = new Dish(dishId, dishName);
 
             } else {
                 return null;
@@ -53,7 +54,7 @@ public class DataRetriever {
                String ingredientCategory = resultSet.getString(4);
                int dishId = resultSet.getInt(5);
 
-                Ingredient dishIngredient = new Ingredient(ingredientId, ingredientName, ingredientPrice, ingredientCategory, dishId);
+                Ingredient dishIngredient = new Ingredient(ingredientId, ingredientName);
                 ingredients.add(dishIngredient);
             }
 
@@ -67,10 +68,6 @@ public class DataRetriever {
     }
 
 
-
-
-
-
     public List<Ingredient> findIngredients(int page, int size){
         List<Ingredient> ingredientsList = new ArrayList<>();
         Connection databaseConnection = dbConnection.getConnection();
@@ -81,23 +78,20 @@ public class DataRetriever {
             String sql_query = "SELECT id, name , price, category , id_dish from ingredient order by id limit ? offset ? ";
             PreparedStatement st = databaseConnection.prepareStatement(sql_query);
 
-            st.setInt(1, page);
-            st.setInt(2, offset);
+            st.setInt(1, offset);
+            st.setInt(2, size);
 
             ResultSet rs = st.executeQuery();
 
-
-
             while(rs.next()){
 
-                int ingredientId = rs.getInt("id");
-                String ingredientName = rs.getString("name");
+                int ingredientId = rs.getInt(1);
+                String ingredientName = rs.getString(2);
                 Double ingredientPrice = rs.getDouble(3);
                 String ingredientCategory = rs.getString(4);
                 int dishId = rs.getInt(5);
 
-
-                Ingredient ing =  new Ingredient(ingredientId, ingredientName, ingredientPrice, ingredientCategory, dishId);
+                Ingredient ing =  new Ingredient(ingredientId, ingredientName);
 
                 ingredientsList.add(ing);
 
@@ -110,9 +104,6 @@ public class DataRetriever {
     }
 
 
-
-
-
     public List<Ingredient> createIngredients (List<Ingredient> newIngredients){
         List<Ingredient> ingredientsCreated = new ArrayList<>();
         Connection databaseConnection = dbConnection.getConnection();
@@ -121,12 +112,56 @@ public class DataRetriever {
         return ingredientsCreated;
     }
 
+
+
+
     public Dish saveDish(Dish dishToSave){
         throw new RuntimeException("not yet implemented");
     }
 
     public List<Dish> findDishsByIngredientName (String ingredientName){
-        throw new RuntimeException("not yet implemented");
+        Ingredient ing ;
+        List<Dish> dishList = new ArrayList<>();
+        Connection databaseConnection = dbConnection.getConnection();
+
+        try{
+
+            String sql = "select i.id i.name, i.id_dish from ingredient i  where i.name ilike ? ";
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()){
+                int ingId = resultSet.getInt("id");
+                String ingName = resultSet.getString("name");
+
+                ing = new Ingredient(ingId, ingName );
+
+            }else {
+                return null;
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
+        try{
+            String sql = "Select d.id, ";
+            PreparedStatement preparedStatement = databaseConnection.prepareStatement(sql);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while(rs.next()){
+                int dishId = rs.getInt("id_dish");
+                String dishName = rs.getString("name");
+
+                Dish dish = new Dish(dishId, dishName);
+
+                dishList.add(dish);
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
+
+       return dishList;
     }
 
     public List<Ingredient> findIngredientsByCriteria
