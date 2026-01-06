@@ -11,7 +11,7 @@ public class Dish {
 
 
 
-    public Dish(Integer id, String name, DishTypeEnum dishType) {
+    public Dish() {
         this.id = id;
         this.name = name;
         this.dishType = this.dishType;

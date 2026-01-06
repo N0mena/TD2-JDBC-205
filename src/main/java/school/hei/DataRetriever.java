@@ -33,7 +33,7 @@ public class DataRetriever {
                     String dishTypeStr = resultSet.getString("dish_type");
                     DishTypeEnum dishType = DishTypeEnum.valueOf(dishTypeStr);
 
-                    dishById = new Dish(dishId, dishName, dishType);
+                    dishById = new Dish();
 
 
             } else {
@@ -56,17 +56,19 @@ public class DataRetriever {
                String ingredientCategory = resultSet.getString("category");
                int dishId = resultSet.getInt(5);
 
-                Ingredient dishIngredient = new Ingredient(ingredientId, ingredientName, ingredientPrice, ingredientCategory);
+                Ingredient dishIngredient = new Ingredient();
                 ingredients.add(dishIngredient);
             }
 
+            dishById.setIngredients(ingredients);
+            return dishById;
         }catch (SQLException e){
             throw new RuntimeException(e);
+        } finally {
+            dbConnection.closeConnection();
         }
 
-        dishById.setIngredients(ingredients);
 
-        return dishById;
     }
 
 
@@ -95,16 +97,18 @@ public class DataRetriever {
                 String category = resultSet.getString("category");
                 int dishId = resultSet.getInt(5);
 
-                Ingredient ing =  new Ingredient(id, name, price , category);
+                Ingredient ing =  new Ingredient();
 
                 ingredientsList.add(ing);
 
             }
+            return ingredientsList;
         }catch (SQLException e){
             throw new RuntimeException(e);
+        }  finally {
+            dbConnection.closeConnection();
         }
 
-        return ingredientsList;
     }
 
 
@@ -131,7 +135,7 @@ public class DataRetriever {
 
                 if(resultSetInsert.next()){
                     ingredientsCreated.add(
-                            new Ingredient(resultSetInsert.getInt(1), resultSetInsert.getString(2), resultSetInsert.getDouble(3), resultSetInsert.getString(4))
+                            new Ingredient()
                     );
                 }
             }
@@ -142,6 +146,8 @@ public class DataRetriever {
         }catch (SQLException e){
             databaseConnection.rollback();
             throw e;
+        } finally {
+            dbConnection.closeConnection();
         }
 
     }
@@ -149,7 +155,43 @@ public class DataRetriever {
 
 
     public Dish saveDish(Dish dishToSave){
-        throw new RuntimeException("not yet implemented");
+
+        String insertDishSql =
+                "INSERT INTO dish(name, price) VALUES (?, ?) RETURNING id";
+
+        String updateDishSql =
+                "UPDATE dish SET name = ?, price = ? WHERE id = ?";
+
+        String deleteIngredientsSql =
+                "DELETE FROM ingredient WHERE id_dish = ?";
+
+        String insertIngredientSql =
+                "INSERT INTO ingredient(d.id, i.id) VALUES (?, ?)";
+
+        Connection databaseConnection = dbConnection.getConnection();
+
+
+        try{
+            databaseConnection.setAutoCommit(false);
+            if(dishToSave.getId() == null){
+
+                    PreparedStatement preparedStatement = databaseConnection.prepareStatement(insertDishSql);
+                    preparedStatement.setString(1, dishToSave.getName());
+                    ResultSet resultSet = preparedStatement.executeQuery();
+
+
+
+
+
+            }
+
+
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        } finally {
+            dbConnection.closeConnection();
+        }
+
     }
 
 
@@ -170,15 +212,18 @@ public class DataRetriever {
                 String dishName = resultSet.getString("name");
                 DishTypeEnum dishType = DishTypeEnum.valueOf(resultSet.getString("dish_type"));
 
-                Dish dishToFind = new Dish(dishId, dishName, dishType );
+                Dish dishToFind = new Dish();
                 dishList.add(dishToFind);
 
             }
 
+            return dishList;
         }catch (SQLException e){
             throw new RuntimeException(e);
+        } finally {
+            dbConnection.closeConnection();
         }
-       return dishList;
+
     }
 
 
@@ -228,25 +273,30 @@ public class DataRetriever {
                 preparedStatement.setObject(i + 1, params.get(i));
             }
 
-            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSet rs = preparedStatement.executeQuery();
 
-            while (resultSet.next()) {
-                int id = resultSet.getInt(1);
-                String name = resultSet.getString("name");
-                Double price = resultSet.getDouble("price");
-                CategoryEnum categoryCol = CategoryEnum.valueOf(resultSet.getString("category"));
-                int dishId = resultSet.getInt(5);
+            while (rs.next()) {
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(rs.getInt("id"));
+                ingredient.setName(rs.getString("name"));
+                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
 
-                Ingredient ing =  new Ingredient(id, name, price, categoryCol);
+                Dish dish = new Dish();
+                dish.setId(rs.getInt("id_dish"));
+                dish.setName(rs.getString("dish_name"));
 
-                ingredients.add(ing);
+                ingredient.setDish(dish);
+
+                ingredients.add(ingredient);
             }
 
+            return ingredients;
         } catch (SQLException e) {
             throw new RuntimeException("Error while fetching ingredients", e);
+        } finally {
+            databaseConnection.closeConnection();
         }
 
-        return ingredients;
     }
 }
 
