@@ -1,14 +1,15 @@
 package school.hei;
 
 import java.sql.Connection;
+import java.util.Collections;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
 
         DataRetriever dataRetriever = new DataRetriever();
-
-        System.out.println();
-
+        List<Ingredient> dish = dataRetriever.createIngredients(new Ingredient());
+        System.out.println(dish);
 
     }
 }

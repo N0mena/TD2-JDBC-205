@@ -9,13 +9,15 @@ public class Ingredient {
     private CategoryEnum category;
     private Dish dish;
 
-    public Ingredient(Integer id, String name, Double price, CategoryEnum category, Dish dish) {
+    public Ingredient(Integer id, String name, Double price, String category) {
         this.id = id;
         this.name = name;
-        this.price = price;
-        this.category = category;
+        this.price = this.price;
+        this.category = this.category;
         this.dish = dish;
     }
+
+
 
     public String getDishName(){
         return dish == null ? null : dish.getName();

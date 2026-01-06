@@ -9,12 +9,12 @@ public class Dish {
     private DishTypeEnum dishType;
     private List<Ingredient> ingredients;
 
-    public Dish(){};
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, List<Ingredient> ingredients) {
+
+    public Dish(Integer id, String name, DishTypeEnum dishType) {
         this.id = id;
         this.name = name;
-        this.dishType = dishType;
+        this.dishType = this.dishType;
         this.ingredients = ingredients;
     }
 
@@ -39,7 +39,7 @@ public class Dish {
         return dishType;
     }
 
-    public void setDishType(DishTypeEnum dishType) {
+    public void setDishType() {
         this.dishType = dishType;
     }
 
