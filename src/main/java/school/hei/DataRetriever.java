@@ -1,9 +1,6 @@
 package school.hei;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,8 +153,13 @@ public class DataRetriever {
 
     public Dish saveDish(Dish dishToSave){
 
+        Connection databaseConnection = dbConnection.getConnection();
+
+        String selectDishSql =
+                "select d.id, d.name. d.dish_type from dish d where d.name = ?" ;
+
         String insertDishSql =
-                "INSERT INTO dish(name, price) VALUES (?, ?) RETURNING id";
+                "INSERT INTO dish(name, price) VALUES (?, ?) ";
 
         String updateDishSql =
                 "UPDATE dish SET name = ?, price = ? WHERE id = ?";
@@ -168,24 +170,53 @@ public class DataRetriever {
         String insertIngredientSql =
                 "INSERT INTO ingredient(d.id, i.id) VALUES (?, ?)";
 
-        Connection databaseConnection = dbConnection.getConnection();
 
 
         try{
             databaseConnection.setAutoCommit(false);
             if(dishToSave.getId() == null){
 
-                    PreparedStatement preparedStatement = databaseConnection.prepareStatement(insertDishSql);
+                    PreparedStatement preparedStatement = databaseConnection.prepareStatement(selectDishSql);
                     preparedStatement.setString(1, dishToSave.getName());
                     ResultSet resultSet = preparedStatement.executeQuery();
 
+                    if(resultSet.next()){
+                        dishToSave.setId(resultSet.getInt(1));
 
-
-
-
+                    }
             }
-
-
+            if(dishToSave.getId() == null){
+                try (PreparedStatement ps = databaseConnection.prepareStatement(insertDishSql)) {
+                    ps.setString(1, dishToSave.getName());
+                    ps.setObject(2, dishToSave.getDishType(), Types.OTHER);
+                    ResultSet rs = ps.executeQuery();
+                    rs.next();
+                    dishToSave.setId(rs.getLong(1));
+                }
+            } else {
+                try (PreparedStatement ps = databaseConnection.prepareStatement(updateDishSql)) {
+                    ps.setString(1, dishToSave.getName());
+                    ps.setObject(2, dishToSave.getDishType(), Types.OTHER);
+                    ps.setLong(3, dishToSave.getId());
+                    ps.executeUpdate();
+                }
+            }
+            try (PreparedStatement ps =
+                         databaseConnection.prepareStatement(deleteIngredientsSql)) {
+                ps.setLong(1, dishToSave.getId());
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps =
+                         databaseConnection.prepareStatement(insertIngredientSql)) {
+                for (Ingredient ing : dishToSave.getIngredients()) {
+                    ps.setLong(1, dishToSave.getId());
+                    ps.setLong(2, ing.getId());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+            databaseConnection.commit();
+            return dishToSave;
         }catch (SQLException e){
             throw new RuntimeException(e);
         } finally {
