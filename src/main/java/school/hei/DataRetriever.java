@@ -325,7 +325,7 @@ public class DataRetriever {
         } catch (SQLException e) {
             throw new RuntimeException("Error while fetching ingredients", e);
         } finally {
-            databaseConnection.closeConnection();
+            dbConnection.closeConnection();
         }
 
     }
