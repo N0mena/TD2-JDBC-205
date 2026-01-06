@@ -170,8 +170,6 @@ public class DataRetriever {
         String insertIngredientSql =
                 "INSERT INTO ingredient(d.id, i.id) VALUES (?, ?)";
 
-
-
         try{
             databaseConnection.setAutoCommit(false);
             if(dishToSave.getId() == null){
@@ -191,7 +189,7 @@ public class DataRetriever {
                     ps.setObject(2, dishToSave.getDishType(), Types.OTHER);
                     ResultSet rs = ps.executeQuery();
                     rs.next();
-                    dishToSave.setId(rs.getLong(1));
+                    dishToSave.setId(rs.getInt(1));
                 }
             } else {
                 try (PreparedStatement ps = databaseConnection.prepareStatement(updateDishSql)) {
