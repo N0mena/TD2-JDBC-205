@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
 
         DataRetriever dataRetriever = new DataRetriever();
-        List<Ingredient> dish = dataRetriever.createIngredients(new Ingredient());
+        List<Ingredient> dish = dataRetriever.();
         System.out.println(dish);
 
     }
