@@ -2,7 +2,9 @@ package school.hei;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DataRetriever {
     private final DBConnection dbConnection = new DBConnection();
@@ -25,13 +27,12 @@ public class DataRetriever {
 
             if (resultSet.next()) {
 
-                    int dishId = resultSet.getInt(1);
-                    String dishName = resultSet.getString("name");
-                    String dishTypeStr = resultSet.getString("dish_type");
-                    DishTypeEnum dishType = DishTypeEnum.valueOf(dishTypeStr);
-
-                    dishById = new Dish();
-
+                 dishById = new Dish(
+                         resultSet.getInt("id"),
+                         resultSet.getString("name"),
+                         DishTypeEnum.valueOf(resultSet.getString("dish_type")),
+                         ingredients
+                 );
 
             } else {
                 return null;
@@ -45,15 +46,16 @@ public class DataRetriever {
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(sqlIngredient);
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             while (resultSet.next()) {
+                Ingredient dishIngredient = new Ingredient(
+                        resultSet.getInt(1),
+                        resultSet.getString("name"),
+                        resultSet.getDouble("price"),
+                        CategoryEnum.valueOf(resultSet.getString("category")),
+                        dishById
+                );
 
-;              int ingredientId = resultSet.getInt(1);
-               String ingredientName = resultSet.getString("name");
-               Double ingredientPrice = resultSet.getDouble("price");
-               String ingredientCategory = resultSet.getString("category");
-               int dishId = resultSet.getInt(5);
-
-                Ingredient dishIngredient = new Ingredient();
                 ingredients.add(dishIngredient);
             }
 
@@ -64,8 +66,6 @@ public class DataRetriever {
         } finally {
             dbConnection.closeConnection();
         }
-
-
     }
 
 
@@ -87,16 +87,20 @@ public class DataRetriever {
             ResultSet resultSet = st.executeQuery();
 
             while(resultSet.next()){
+                Dish dish = new Dish(resultSet.getInt("id"),
+                        resultSet.getString("name")
+                );
 
-                int id = resultSet.getInt(1);
-                String name = resultSet.getString("name");
-                Double price = resultSet.getDouble("price");
-                String category = resultSet.getString("category");
-                int dishId = resultSet.getInt(5);
+                Ingredient dishIngredient = new Ingredient(
+                        resultSet.getInt(1),
+                        resultSet.getString("name"),
+                        resultSet.getDouble("price"),
+                        CategoryEnum.valueOf(resultSet.getString("category")),
+                        dish
+                );
 
-                Ingredient ing =  new Ingredient();
 
-                ingredientsList.add(ing);
+                ingredientsList.add(dishIngredient);
 
             }
             return ingredientsList;
@@ -132,7 +136,7 @@ public class DataRetriever {
 
                 if(resultSetInsert.next()){
                     ingredientsCreated.add(
-                            new Ingredient()
+                            new Ingredient(resultSetInsert.getInt(1), resultSetInsert.getString("name"), resultSetInsert.getDouble("price"), CategoryEnum.valueOf(resultSetInsert.getString("category")))
                     );
                 }
             }
@@ -207,8 +211,8 @@ public class DataRetriever {
             try (PreparedStatement ps =
                          databaseConnection.prepareStatement(insertIngredientSql)) {
                 for (Ingredient ing : dishToSave.getIngredients()) {
-                    ps.setLong(1, dishToSave.getId());
-                    ps.setLong(2, ing.getId());
+                    ps.setInt(1, dishToSave.getId());
+                    ps.setInt(2, ing.getId());
                     ps.addBatch();
                 }
                 ps.executeBatch();
@@ -225,11 +229,17 @@ public class DataRetriever {
 
 
     public List<Dish> findDishsByIngredientName (String ingredientName){
-        Ingredient ing ;
-        List<Dish> dishList = new ArrayList<>();
+
+        Map<Integer, Dish> dishMap = new HashMap<>();
         Connection databaseConnection = dbConnection.getConnection();
 
-            String sql = "select distinct d.id d.name, d.dish_type from dish d join ingredient i on d.id = i.id_dish where i.name ilike ? ";
+            String sql = " SELECT\n" +
+                    "        d.id   AS dish_id,\n" +
+                    "        d.name AS dish_name,\n" +
+                    "        d.dish_type\n" +
+                    "    FROM ingredient i\n" +
+                    "    JOIN dish d ON d.id = i.id_dish\n" +
+                    "    WHERE i.name ILIKE ? ";
         try{
 
             PreparedStatement preparedStatement = databaseConnection.prepareStatement(sql);
@@ -237,12 +247,17 @@ public class DataRetriever {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while(resultSet.next()){
-                int dishId = resultSet.getInt("id");
-                String dishName = resultSet.getString("name");
-                DishTypeEnum dishType = DishTypeEnum.valueOf(resultSet.getString("dish_type"));
+                int dishId = resultSet.getInt("dish_id");
 
-                Dish dishToFind = new Dish();
-                dishList.add(dishToFind);
+                dishMap.computeIfAbsent(dishId, id ->
+                        new Dish(
+                                id,
+                                resultSet.getString("dish_name"),
+                                DishTypeEnum.valueOf(resultSet.getString("dish_type"))
+                        )
+                );
+
+                List<Dish> dishList = new ArrayList<>(dishMap.values());
 
             }
 
@@ -302,17 +317,16 @@ public class DataRetriever {
                 preparedStatement.setObject(i + 1, params.get(i));
             }
 
-            ResultSet rs = preparedStatement.executeQuery();
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (rs.next()) {
-                Ingredient ingredient = new Ingredient();
-                ingredient.setId(rs.getInt("id"));
-                ingredient.setName(rs.getString("name"));
-                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+            while (resultSet.next()) {
+                Ingredient ingredient = new Ingredient(resultSet.getInt(1), resultSet.getString("name"), resultSet.getDouble("price"), CategoryEnum.valueOf(resultSet.getString("category")));
 
-                Dish dish = new Dish();
-                dish.setId(rs.getInt("id_dish"));
-                dish.setName(rs.getString("dish_name"));
+                Dish dish = new Dish(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name")
+                );
+
 
                 ingredient.setDish(dish);
 

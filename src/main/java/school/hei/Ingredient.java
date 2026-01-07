@@ -9,13 +9,20 @@ public class Ingredient {
     private CategoryEnum category;
     private Dish dish;
 
-    public Ingredient() {
+    public Ingredient(int id, String name, double price, CategoryEnum category, Dish dish) {
         this.id = id;
         this.name = name;
-        this.price = this.price;
-        this.category = this.category;
+        this.price = price;
+        this.category = category;
         this.dish = dish;
     }
+    public Ingredient(int id, String name, double price, CategoryEnum category) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
 
 
 
