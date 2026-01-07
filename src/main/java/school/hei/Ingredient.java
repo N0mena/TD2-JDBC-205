@@ -7,12 +7,30 @@ public class Ingredient {
     private String name;
     private Double price;
     private CategoryEnum category;
+    private Double required_quantity;
     private Dish dish;
 
     public Ingredient(int id, String name, double price, CategoryEnum category, Dish dish) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.category = category;
+        this.dish = dish;
+    }
+
+    public Double getRequired_quantity() {
+        return required_quantity;
+    }
+
+    public void setRequired_quantity(Double required_quantity) {
+        this.required_quantity = required_quantity;
+    }
+
+    public Ingredient(int id, String name, double price, double required_quantity, CategoryEnum category, Dish dish) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.required_quantity = required_quantity;
         this.category = category;
         this.dish = dish;
     }
@@ -42,8 +60,15 @@ public class Ingredient {
         return name;
     }
 
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Double getRequiredQuantity(){return  required_quantity;}
+
+    public Double setRequiredQuantity(Double required_quantity) {this.required_quantity = required_quantity;
+        return required_quantity;
     }
 
     public Double getPrice() {
@@ -88,6 +113,7 @@ public class Ingredient {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", price=" + price +
+                ", required_quantity=" + required_quantity +
                 ", category=" + category +
                 ", dish=" + getDishName() +
                 '}';

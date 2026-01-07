@@ -8,19 +8,26 @@ public class Dish {
     private String name;
     private DishTypeEnum dishType;
     private List<Ingredient> ingredients;
+    private Double cost;
 
-    public Dish(int id, String name, DishTypeEnum dishType, List<Ingredient> ingredients) {
+    public Dish(int id, String name, DishTypeEnum dishType, List<Ingredient> ingredients, Double cost) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
         this.ingredients = ingredients;
+        this.cost = getDishCost();
     }
 
     public Dish(int id, String name) {
         this.id = id;
         this.name = name;
     }
-
+    public Dish(int id, String name, DishTypeEnum dishType, List<Ingredient> ingredients) {
+        this.id = id;
+        this.name = name;
+        this.dishType = dishType;
+        this.ingredients = ingredients;
+    }
 
     public Integer getId() {
         return id;
@@ -77,10 +84,23 @@ public class Dish {
     }
 
 
-    public Double getDishPrice(){
-        return ingredients.stream()
-                .map(ingredient -> ingredient.getPrice())
-                .reduce(0.0, Double::sum);
+    public Double getDishCost() {
+        double totalCost = 0.0;
+
+        for (Ingredient ingredient : ingredients) {
+
+            if (ingredient.getRequiredQuantity() == null) {
+                throw new RuntimeException(
+                        "Quantité nécessaire inconnue pour l'ingrédient : "
+                                + ingredient.getName()
+                );
+            }
+
+            totalCost += ingredient.getPrice()
+                    * ingredient.getRequiredQuantity();
+        }
+
+        return totalCost;
     }
 
 }
