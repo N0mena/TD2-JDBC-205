@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
 
         DataRetriever dataRetriever = new DataRetriever();
-        Dish dish1 = dataRetriever.findDishById(2);
+        Dish dish1 = dataRetriever.findDishById(1);
         System.out.println(dish1 + "cost :" + dish1.getDishCost());
 
 

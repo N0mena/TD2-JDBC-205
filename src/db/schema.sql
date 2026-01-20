@@ -4,6 +4,7 @@ create table Dish(
                      id serial primary key ,
                      name varchar(255) not null,
                      dish_type dish_category
+
 );
 
 
@@ -17,4 +18,7 @@ create table Ingredient (
     id_dish integer references Dish(id)
 );
 
+
+ALTER TABLE ingredient
+    ADD COLUMN IF NOT EXISTS required_quantity NUMERIC;
 

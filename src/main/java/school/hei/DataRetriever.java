@@ -47,6 +47,8 @@ public class DataRetriever {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
+
+
             while (resultSet.next()) {
                 Ingredient dishIngredient = new Ingredient(
                         resultSet.getInt(1),
@@ -60,7 +62,6 @@ public class DataRetriever {
                 ingredients.add(dishIngredient);
             }
 
-
             dishById.setIngredients(ingredients);
             return dishById ;
         }catch (SQLException e){
@@ -69,8 +70,6 @@ public class DataRetriever {
             dbConnection.closeConnection();
         }
     }
-
-
 
 
     public List<Ingredient> findIngredients(int page, int size){
@@ -340,12 +339,11 @@ public class DataRetriever {
             String sql = """
             INSERT INTO ingredient (name, price, required_quantity)
             VALUES (?, ?, ?)
-            RETURNING id
         """;
 
             try (PreparedStatement ps = databaseConnection.prepareStatement(sql)) {
                 ps.setString(1, ingredient.getName());
-                ps.setDouble(2, ingredient.getPrice());
+                ps.setObject(2, ingredient.getPrice());
 
                 if (ingredient.getRequiredQuantity() != null) {
                     ps.setDouble(3, ingredient.getRequiredQuantity());
