@@ -1,5 +1,5 @@
 package school.hei;
 
-public enum MouvementType {
+public enum MovementType {
     IN, OUT,
 }
