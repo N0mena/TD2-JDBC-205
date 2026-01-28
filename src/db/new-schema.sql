@@ -13,3 +13,9 @@ ALTER TABLE Dish
 Alter table ingredient drop column id_dish;
 
 Alter table ingredient drop column required_quantity;
+
+create type movement_type as enum ('IN', 'OUT');
+
+create table stock_movement(
+
+)

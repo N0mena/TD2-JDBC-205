@@ -30,3 +30,7 @@ UPDATE Dish SET selling_price = 12000.00   WHERE name = 'Poulet grillé';
 UPDATE Dish SET selling_price = NULL WHERE name = 'Riz aux légumes';
 UPDATE Dish SET selling_price = 8000.00 WHERE name = 'Gâteau au chocolat';
 UPDATE Dish SET selling_price = NULL WHERE name = 'Salade de fruits';
+
+insert into stock_movement(
+
+)
