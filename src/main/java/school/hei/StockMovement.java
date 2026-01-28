@@ -1,24 +1,24 @@
 package school.hei;
 
-import java.util.Objects;
+import java.security.Timestamp;
+import java.util.List;
 
-public class DishIngredient {
+public class StockMovement {
     private Integer id;
-    private Dish dish;
     private Ingredient ingredient;
     private Double quantity;
     private UnitType unitType;
+    private Timestamp creationDate;
+    private MovementType movementType;
 
-    public DishIngredient() {}
-
-    public DishIngredient(Integer id, Dish dish, Ingredient ingredient, Double quantity, UnitType unitType) {
+    public StockMovement(Integer id, Ingredient ingredient, Double quantity, UnitType unitType, Timestamp creationDate, MovementType movementType) {
         this.id = id;
-        this.dish = dish;
         this.ingredient = ingredient;
         this.quantity = quantity;
         this.unitType = unitType;
+        this.creationDate = creationDate;
+        this.movementType = movementType;
     }
-
 
     public Integer getId() {
         return id;
@@ -26,14 +26,6 @@ public class DishIngredient {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Dish getDish() {
-        return dish;
-    }
-
-    public void setDish(Dish dish) {
-        this.dish = dish;
     }
 
     public Ingredient getIngredient() {
@@ -60,15 +52,19 @@ public class DishIngredient {
         this.unitType = unitType;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        DishIngredient that = (DishIngredient) o;
-        return Objects.equals(id, that.id) && Objects.equals(dish, that.dish) && Objects.equals(ingredient, that.ingredient) && Objects.equals(quantity, that.quantity) && unitType == that.unitType;
+    public Timestamp getCreationDate() {
+        return creationDate;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, dish, ingredient, quantity, unitType);
+    public void setCreationDate(Timestamp creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public MovementType getMovementType() {
+        return movementType;
+    }
+
+    public void setMovementType(MovementType movementType) {
+        this.movementType = movementType;
     }
 }

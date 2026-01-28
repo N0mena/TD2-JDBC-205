@@ -19,11 +19,11 @@ UPDATE ingredient SET required_quantity = NULL WHERE name = 'Beurre';
 
 select  * from ingredient;
 
-insert into DishIngredient values (1,1,1,0.20,'KG'),
+insert into dish_ingredient values (1,1,1,0.20,'KG'),
                                   (2,1,2,0.15,'KG'),
                                   (3,2,3,1.00,'KG'),
                                   (4,4,4,0.30,'KG'),
-                                  (5,4,5,0.20,'KG')
+                                  (5,4,5,0.20,'KG');
 
 UPDATE Dish SET selling_price = 3500.00   WHERE name = 'Salade fraîche';
 UPDATE Dish SET selling_price = 12000.00   WHERE name = 'Poulet grillé';
