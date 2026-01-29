@@ -8,28 +8,110 @@ import static java.time.Instant.now;
 
 public class DataRetriever {
 
-    Order SaveOrder(Order orderToSave){
+    public Sale createSaleFrom(Order order) {
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = dbConnection.getConnection();
+        if (order == null || order.getId() == null) {
+            throw new IllegalArgumentException("Commande inexistante");
+        }
+
+        if (order.getPaymentStatus() !=  PaymentStatusEnum.PAID) {
+            throw new IllegalStateException(
+                    "Impossible de créer une vente pour une commande non payée"
+            );
+        }
+
+        String checkSql = "SELECT id, creation_datetime FROM sale WHERE order_id = ?";
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
+            checkStmt.setInt(1, order.getId());
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                return new Sale(
+                        rs.getInt("id"),
+                        order,
+                        rs.getTimestamp("creation_datetime").toInstant()
+                );
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        String insertSql = """
+        INSERT INTO sale (order_id)
+        VALUES (?)
+        RETURNING id, creation_datetime
+    """;
+
+        try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
+            insertStmt.setInt(1, order.getId());
+            ResultSet rs = insertStmt.executeQuery();
+
+            if (rs.next()) {
+                return new Sale(
+                        rs.getInt("id"),
+                        order,
+                        rs.getTimestamp("creation_datetime").toInstant()
+                );
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
+
+
+    Order SaveOrder(Order orderToSave) {
+
         List<DishOrder> dishOrderList = orderToSave.getDishOrderList();
-        for(DishOrder dishOrder : dishOrderList){
+
+        if (orderToSave.isPaid()) {
+            throw new IllegalStateException(
+                    "La commande est déjà payée et ne peut plus être modifiée"
+            );
+        }
+        for (DishOrder dishOrder : dishOrderList) {
             Dish dish = dishOrder.getDish();
             List<DishIngredient> dishIngredients = dish.getDishIngredients();
-            for(DishIngredient dishIngredient : dishIngredients){
+            for (DishIngredient dishIngredient : dishIngredients) {
                 Ingredient ingredient = dishIngredient.getIngredient();
                 StockValue actualStock = ingredient.getStockValueAt(now());
                 double requiredQuantity = dishOrder.getQuantity() * dishIngredient.getQuantity();
-                if(actualStock.getQuantity() < requiredQuantity){
+                if (actualStock.getQuantity() < requiredQuantity) {
                     throw new RuntimeException("Stock Insufficient");
                 }
             }
-         }
-        return orderToSave;
+
+        }
+
+        DBConnection dbConnection = new DBConnection();
+
+        try (Connection connection = dbConnection.getConnection()) {
+
+            String sql = """
+            UPDATE "order"
+            SET payment_status = ?
+            WHERE id = ?
+        """;
+
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, orderToSave.getPaymentStatus().name());
+                ps.setInt(2, orderToSave.getId());
+                ps.executeUpdate();
+            }
+            return orderToSave;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    Order findOrderByReference(String reference) {
+        Order findOrderByReference(String reference) {
         DBConnection dbConnection = new DBConnection();
         try (Connection connection = dbConnection.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("""
-                    select id, reference, creation_datetime from "order" where reference like ?""");
+                    select id, reference, creation_datetime, payment_status from "order" where reference like ?""");
             preparedStatement.setString(1, reference);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -38,6 +120,11 @@ public class DataRetriever {
                 order.setId(idOrder);
                 order.setReference(resultSet.getString("reference"));
                 order.setCreationDatetime(resultSet.getTimestamp("creation_datetime").toInstant());
+                order.setDishOrderList(findDishOrderByIdOrder(idOrder));
+                order.setPaymentStatus(
+                        PaymentStatusEnum.valueOf(resultSet.getString("payment_status"))
+                );
+
                 order.setDishOrderList(findDishOrderByIdOrder(idOrder));
                 return order;
             }

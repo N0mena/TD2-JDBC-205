@@ -1,5 +1,4 @@
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,6 +7,8 @@ public class Order {
     private String reference;
     private Instant creationDatetime;
     private List<DishOrder> dishOrderList;
+    private PaymentStatusEnum paymentStatus;
+
 
     public Order() {}
 
@@ -51,6 +52,14 @@ public class Order {
         this.dishOrderList = dishOrderList;
     }
 
+    public PaymentStatusEnum getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatusEnum paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -59,6 +68,7 @@ public class Order {
                 ", creationDatetime=" + creationDatetime +
                 ", dishOrderList=" + dishOrderList +
                 ", getTotalAmountWithVat()=" + getTotalAmountWithVat() +
+                ", paymentStatus=" + paymentStatus +
                 '}';
     }
 
@@ -70,6 +80,15 @@ public class Order {
 
         }
         return totalAmount;
+    }
+
+
+    public boolean isPaid() {
+        return paymentStatus == PaymentStatusEnum.PAID;
+    }
+
+    public void markAsPaid() {
+        this.paymentStatus = PaymentStatusEnum.PAID;
     }
 
     Double getTotalAmountWithVat() {

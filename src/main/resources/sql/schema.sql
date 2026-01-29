@@ -79,3 +79,19 @@ create table if not exists dish_order
 );
 
 Alter table dish_ingredient rename column quantity_required to required_quantity;
+
+CREATE TYPE payment_status AS ENUM ('PAID', 'UNPAID');
+
+CREATE TABLE sale (
+                      id SERIAL PRIMARY KEY,
+                      creation_datetime TIMESTAMP NOT NULL DEFAULT NOW(),
+                      order_id INT NOT NULL UNIQUE,
+                      CONSTRAINT fk_sale_order
+                          FOREIGN KEY (order_id)
+                              REFERENCES "order"(id)
+);
+
+ALTER TABLE "order"
+    ADD COLUMN payment_status payment_status NOT NULL DEFAULT 'UNPAID';
+
+
