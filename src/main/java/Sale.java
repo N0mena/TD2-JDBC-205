@@ -30,11 +30,11 @@ public class Sale {
         this.order = order;
     }
 
-    public LocalDateTime getSaleDate() {
+    public Instant getSaleDate() {
         return saleDate;
     }
 
-    public void setSaleDate(LocalDateTime saleDate) {
+    public void setSaleDate(Instant saleDate) {
         this.saleDate = saleDate;
     }
 

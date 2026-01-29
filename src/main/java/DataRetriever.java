@@ -72,6 +72,7 @@ public class DataRetriever {
                     "La commande est déjà payée et ne peut plus être modifiée"
             );
         }
+
         for (DishOrder dishOrder : dishOrderList) {
             Dish dish = dishOrder.getDish();
             List<DishIngredient> dishIngredients = dish.getDishIngredients();
@@ -264,7 +265,8 @@ public class DataRetriever {
     Ingredient findIngredientById(Integer id) {
         DBConnection dbConnection = new DBConnection();
         try (Connection connection = dbConnection.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("select id, name, price, category from ingredient where id = ?;");
+            PreparedStatement preparedStatement =
+                    connection.prepareStatement("select id, name, price, category from ingredient where id = ?;");
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {

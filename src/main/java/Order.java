@@ -12,11 +12,12 @@ public class Order {
 
     public Order() {}
 
-    public Order(Integer id, String reference, Instant creationDatetime, List<DishOrder> dishOrderList) {
+    public Order(Integer id, String reference, Instant creationDatetime, List<DishOrder> dishOrderList,PaymentStatusEnum paymentStatus) {
         this.id = id;
         this.reference = reference;
         this.creationDatetime = creationDatetime;
         this.dishOrderList = dishOrderList;
+        this.paymentStatus = paymentStatus;
     }
 
 
@@ -87,8 +88,8 @@ public class Order {
         return paymentStatus == PaymentStatusEnum.PAID;
     }
 
-    public void markAsPaid() {
-        this.paymentStatus = PaymentStatusEnum.PAID;
+    public void markAsUnPaid() {
+        this.paymentStatus = PaymentStatusEnum.UNPAID;
     }
 
     Double getTotalAmountWithVat() {
